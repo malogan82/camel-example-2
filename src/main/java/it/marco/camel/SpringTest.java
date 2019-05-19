@@ -30,8 +30,9 @@ public class SpringTest {
 	        ProducerTemplate template = main.getCamelTemplate();
 	        Persona persona = new Persona("Mario","Rossi");
 	        //Object response1 = template.requestBody("direct:marshal",persona);
-	        Object response2 = template.requestBody("binding:jaxb:direct:marshal-endpoint",persona);
-			System.out.println(response2);
+	        //Object response2 = template.requestBody("binding:jaxb:direct:marshal-endpoint",persona);
+	        Object response3 = template.requestBody("jaxbmc:FirstDirect",persona);
+			System.out.println(response3);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

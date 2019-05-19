@@ -1,38 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:camel="http://camel.apache.org/schema/spring"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans 
-         				   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-         				   http://camel.apache.org/schema/spring 
-         				   http://camel.apache.org/schema/spring/camel-spring.xsd">
-    <bean id="jaxb" class="org.apache.camel.processor.binding.DataFormatBinding">
+    xmlns:camel="http://camel.apache.org/schema/spring"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans                  http://www.springframework.org/schema/beans/spring-beans-3.0.xsd                 http://camel.apache.org/schema/spring                  http://camel.apache.org/schema/spring/camel-spring.xsd">
+    <bean class="org.apache.camel.component.binding.BindingComponent" id="jaxbmc">
+        <constructor-arg ref="jaxb"/>
+        <constructor-arg value="direct:marshal-component"/>
+    </bean>
+    <bean class="org.apache.camel.processor.binding.DataFormatBinding" id="jaxb">
         <constructor-arg ref="jaxbformat"/>
     </bean>
-
-    <bean id="jaxbformat" class="org.apache.camel.converter.jaxb.JaxbDataFormat">
+    <bean class="org.apache.camel.converter.jaxb.JaxbDataFormat" id="jaxbformat">
         <property name="prettyPrint" value="true"/>
         <property name="contextPath" value="it.marco.camel.model"/>
     </bean>
-    
-	<camelContext id="camel-context-jaxb" xmlns="http://camel.apache.org/schema/spring">
-	  <route id="marshal">
-	    <from uri="direct:marshal"/>
-	    <marshal>
-	      <jaxb prettyPrint="true" contextPath="it.marco.camel.model"/>
-	    </marshal>
-	    <convertBodyTo type="String"/>
-	    <to uri="direct:unmarshal"/>
-	  </route>
-	  <route id="unmarshal">
-	    <from uri="direct:unmarshal"/>
-	    <unmarshal>
-	      <jaxb prettyPrint="true" contextPath="it.marco.camel.model"/>
-	    </unmarshal>
-	  </route>
-	  <route id="marshal-binding">
-	    <from uri="binding:jaxb:direct:marshal-endpoint"/>
-	    <convertBodyTo type="String"/>
-	  </route>
-	</camelContext>
+    <camelContext id="camel-context-jaxb" xmlns="http://camel.apache.org/schema/spring">
+        <route id="marshal">
+            <from id="_from1" uri="direct:marshal"/>
+            <marshal id="_marshal1">
+                <jaxb contextPath="it.marco.camel.model" prettyPrint="true"/>
+            </marshal>
+            <convertBodyTo id="_convertBodyTo1" type="String"/>
+            <to id="_to1" uri="direct:unmarshal"/>
+        </route>
+        <route id="unmarshal">
+            <from id="_from2" uri="direct:unmarshal"/>
+            <unmarshal id="_unmarshal1">
+                <jaxb contextPath="it.marco.camel.model" prettyPrint="true"/>
+            </unmarshal>
+        </route>
+        <route id="marshal-binding">
+            <from id="_from3" uri="binding:jaxb:direct:marshal-endpoint"/>
+            <convertBodyTo id="_convertBodyTo2" type="String"/>
+        </route>
+        <route id="marshal-component">
+            <from id="_from4" uri="jaxbmc:FirstDirect"/>
+            <convertBodyTo id="_convertBodyTo3" type="String"/>
+        </route>
+    </camelContext>
 </beans>
