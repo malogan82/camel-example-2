@@ -14,28 +14,25 @@
         <property name="prettyPrint" value="true"/>
         <property name="contextPath" value="it.marco.camel.model"/>
     </bean>
-    <bean id="illegal" class="java.lang.IllegalArgumentException">
+    <bean class="java.lang.IllegalArgumentException" id="illegal">
         <constructor-arg index="0" value="Good grief!"/>
     </bean>
-    <bean id="bridgePropertyPlaceholder" class="org.apache.camel.spring.spi.BridgePropertyPlaceholderConfigurer">
-    	<property name="location" value="classpath:it/marco/camel/fusesource/endpoints.properties"/>
-  	</bean>
-  	<bean id="hello" class="it.marco.camel.model.HelloBean">
-   		<property name="greeting" value="${hi}"/>
-  	</bean>
+    <bean
+        class="org.apache.camel.spring.spi.BridgePropertyPlaceholderConfigurer" id="bridgePropertyPlaceholder">
+        <property name="location" value="classpath:it/marco/camel/fusesource/endpoints.properties"/>
+    </bean>
+    <bean class="it.marco.camel.model.HelloBean" id="hello">
+        <property name="greeting" value="${hi}"/>
+    </bean>
     <camelContext id="camel-context-jaxb" xmlns="http://camel.apache.org/schema/spring">
     	<propertyPlaceholder id="properties" location="it/marco/camel/fusesource/endpoints.properties"/>
-    	
-    	<jmxAgent id="agent" registryPort="{{myjmx.port}}"
-        	      usePlatformMBeanServer="{{myjmx.usePlatform}}"
-            	  createConnector="true"
-              	  statisticsLevel="RoutesOnly"/>
-
-    	<route>
-	        <from uri="seda:start"/>
-	        <to uri="mock:result"/>
-	    </route>
-	    
+        <jmxAgent createConnector="true" id="agent"
+            registryPort="{{myjmx.port}}" statisticsLevel="RoutesOnly" usePlatformMBeanServer="{{myjmx.usePlatform}}"/>
+        <threadPoolProfile id="changedProfile" defaultProfile="true" poolSize="3" maxQueueSize="100"/>
+        <route id="_route1">
+            <from id="_from5" uri="seda:start"/>
+            <to id="_to2" uri="mock:result"/>
+        </route>
         <route id="marshal">
             <from id="_from1" uri="direct:marshal"/>
             <marshal id="_marshal1">
@@ -58,22 +55,30 @@
             <from id="_from4" uri="jaxbmc:FirstDirect"/>
             <convertBodyTo id="_convertBodyTo3" type="String"/>
         </route>
-        <route>
-            <from uri="direct:start"/>
-            <multicast prop:stopOnException="stop.flag">
-                <to uri="mock:a"/>
-                <throwException ref="illegal"/>
-                <to uri="mock:b"/>
+        <route id="_route2">
+            <from id="_from6" uri="direct:start"/>
+            <multicast id="_multicast1" prop:stopOnException="stop.flag">
+                <to id="_to3" uri="mock:a"/>
+                <throwException id="_throwException1" ref="illegal"/>
+                <to id="_to4" uri="mock:b"/>
             </multicast>
         </route>
+        <route id="_route3">
+            <from id="_from7" uri="{{cool.bar}}"/>
+            <bean id="_bean1" ref="hello"/>
+            <to id="_to5" uri="{{cool.end}}"/>
+        </route>
+        <route id="_route4">
+            <from id="_from8" uri="{{cool.end}}"/>
+            <log id="_log1" message="${body}"/>
+        </route>
         <route>
-	      	<from uri="{{cool.bar}}"/>
-	      	<bean ref="hello"/>
-	      	<to uri="{{cool.end}}"/>
-	    </route>
-	    <route>
-	    	<from uri="{{cool.end}}"/>
-	    	<log message="${body}"/>
+	        <from uri="direct:inbox"/>
+	        <multicast parallelProcessing="true">
+	            <to uri="mock:a"/>
+	            <to uri="mock:b"/>
+	            <to uri="mock:c"/>
+	        </multicast>
 	    </route>
     </camelContext>
 </beans>

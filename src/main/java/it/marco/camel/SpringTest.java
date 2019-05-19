@@ -33,8 +33,10 @@ public class SpringTest {
 	        //Object response2 = template.requestBody("binding:jaxb:direct:marshal-endpoint",persona);
 	        //Object response3 = template.requestBody("jaxbmc:FirstDirect",persona);
 	        //Object response4 = template.requestBody("direct:start",persona);
-	        Object response5 = template.requestBody("direct:bar",persona);
-			System.out.println(response5);
+	        //Object response5 = template.requestBody("direct:bar",persona);
+	        Object response6 = template.requestBody("direct:inbox",persona);
+			System.out.println(response6);
+			main.stop();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
