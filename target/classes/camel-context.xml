@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:camel="http://camel.apache.org/schema/spring"
+    xmlns:prop="http://camel.apache.org/schema/placeholder"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans                  http://www.springframework.org/schema/beans/spring-beans-3.0.xsd                 http://camel.apache.org/schema/spring                  http://camel.apache.org/schema/spring/camel-spring.xsd">
     <bean class="org.apache.camel.component.binding.BindingComponent" id="jaxbmc">
         <constructor-arg ref="jaxb"/>
@@ -13,7 +14,28 @@
         <property name="prettyPrint" value="true"/>
         <property name="contextPath" value="it.marco.camel.model"/>
     </bean>
+    <bean id="illegal" class="java.lang.IllegalArgumentException">
+        <constructor-arg index="0" value="Good grief!"/>
+    </bean>
+    <bean id="bridgePropertyPlaceholder" class="org.apache.camel.spring.spi.BridgePropertyPlaceholderConfigurer">
+    	<property name="location" value="classpath:it/marco/camel/fusesource/endpoints.properties"/>
+  	</bean>
+  	<bean id="hello" class="it.marco.camel.model.HelloBean">
+   		<property name="greeting" value="${hi}"/>
+  	</bean>
     <camelContext id="camel-context-jaxb" xmlns="http://camel.apache.org/schema/spring">
+    	<propertyPlaceholder id="properties" location="it/marco/camel/fusesource/endpoints.properties"/>
+    	
+    	<jmxAgent id="agent" registryPort="{{myjmx.port}}"
+        	      usePlatformMBeanServer="{{myjmx.usePlatform}}"
+            	  createConnector="true"
+              	  statisticsLevel="RoutesOnly"/>
+
+    	<route>
+	        <from uri="seda:start"/>
+	        <to uri="mock:result"/>
+	    </route>
+	    
         <route id="marshal">
             <from id="_from1" uri="direct:marshal"/>
             <marshal id="_marshal1">
@@ -36,5 +58,22 @@
             <from id="_from4" uri="jaxbmc:FirstDirect"/>
             <convertBodyTo id="_convertBodyTo3" type="String"/>
         </route>
+        <route>
+            <from uri="direct:start"/>
+            <multicast prop:stopOnException="stop.flag">
+                <to uri="mock:a"/>
+                <throwException ref="illegal"/>
+                <to uri="mock:b"/>
+            </multicast>
+        </route>
+        <route>
+	      	<from uri="{{cool.bar}}"/>
+	      	<bean ref="hello"/>
+	      	<to uri="{{cool.end}}"/>
+	    </route>
+	    <route>
+	    	<from uri="{{cool.end}}"/>
+	    	<log message="${body}"/>
+	    </route>
     </camelContext>
 </beans>

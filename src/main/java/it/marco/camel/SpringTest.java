@@ -31,8 +31,10 @@ public class SpringTest {
 	        Persona persona = new Persona("Mario","Rossi");
 	        //Object response1 = template.requestBody("direct:marshal",persona);
 	        //Object response2 = template.requestBody("binding:jaxb:direct:marshal-endpoint",persona);
-	        Object response3 = template.requestBody("jaxbmc:FirstDirect",persona);
-			System.out.println(response3);
+	        //Object response3 = template.requestBody("jaxbmc:FirstDirect",persona);
+	        //Object response4 = template.requestBody("direct:start",persona);
+	        Object response5 = template.requestBody("direct:bar",persona);
+			System.out.println(response5);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

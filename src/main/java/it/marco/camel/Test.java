@@ -2,6 +2,7 @@ package it.marco.camel;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.main.Main;
+import org.apache.camel.component.properties.PropertiesComponent;
 
 import it.marco.camel.builder.TestRouteBuilder2;
 import it.marco.camel.model.Persona;
@@ -11,7 +12,7 @@ public class Test {
 
 	public static void main(String[] args) {
 		Main main = new Main();
-        main.addRouteBuilder(new TestRouteBuilder2());
+		main.addRouteBuilder(new TestRouteBuilder2());
         TestRunnable runnable = new TestRunnable(main);
         Thread thread = new Thread(runnable);
         thread.start();
@@ -63,8 +64,11 @@ public class Test {
 //			System.out.println(response16);
 //			System.out.println(response17);
 //			Object response27 = template.requestBody("direct:marshal",persona);
-			Object response28 = template.requestBody("direct:marshal-xstream",persona);
-			System.out.println(response28);
+//			Object response28 = template.requestBody("{{marshal-xstream}}",persona);
+//			Object response29 = template.requestBody("properties:{{marshal-xstream}}",persona);
+//			Object response30 = template.requestBody("direct:start",persona);
+			Object response31 = template.requestBody("direct:start-default",persona);
+			System.out.println(response31);
 			main.stop();
 		} catch (Exception e) {
 			e.printStackTrace();
